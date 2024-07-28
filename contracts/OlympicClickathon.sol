@@ -8,6 +8,13 @@ contract OlympicClickathon {
     uint256 public totalSupply;
     address public owner;
 
+    struct LeaderboardEntry {
+        address wallet;
+        uint256 score;
+    }
+
+    LeaderboardEntry[3] public leaderboard;
+
     mapping(address => uint256) public balanceOf;
     mapping(address => uint256) public clicks;
     mapping(address => uint256) public highScore;
@@ -16,6 +23,7 @@ contract OlympicClickathon {
     event Click(address indexed user, uint256 clicks);
     event GiftPurchase(address indexed user, string gift, uint256 value);
     event NewHighScore(address indexed user, uint256 highScore);
+    event LeaderboardUpdated(address indexed user, uint256 score);
 
     constructor() {
         owner = msg.sender;
@@ -36,13 +44,33 @@ contract OlympicClickathon {
         clicks[msg.sender] = clickCount;
         balanceOf[msg.sender] += clickCount * (10**uint256(decimals));
         totalSupply += clickCount * (10**uint256(decimals));
-        
+
         if (clickCount > highScore[msg.sender]) {
             highScore[msg.sender] = clickCount;
+            updateLeaderboard(msg.sender, clickCount);
             emit NewHighScore(msg.sender, clickCount);
         }
 
         emit Transfer(address(0), msg.sender, clickCount * (10**uint256(decimals)));
+    }
+
+    function updateLeaderboard(address user, uint256 score) internal {
+        for (uint256 i = 0; i < leaderboard.length; i++) {
+            if (score > leaderboard[i].score) {
+                // Shift lower scores down the leaderboard
+                for (uint256 j = leaderboard.length - 1; j > i; j--) {
+                    leaderboard[j] = leaderboard[j - 1];
+                }
+                // Insert the new high score
+                leaderboard[i] = LeaderboardEntry(user, score);
+                emit LeaderboardUpdated(user, score);
+                break;
+            }
+        }
+    }
+
+    function getLeaderboard() public view returns (LeaderboardEntry[3] memory) {
+        return leaderboard;
     }
 
     function transfer(address to, uint256 value) public returns (bool) {

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Game</title>
+</head>
+<body>
+    <h1>Click Game</h1>
+    <p>Enter your score:</p>
+    <input type="number" id="scoreInput" />
+    <button onclick="submitScore()">Submit Score</button>
+    <h2>Top 3 Leaderboard</h2>
+    <ul id="leaderboard"></ul>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <script>
+        const contractAddress = '0x0aBFB706C999C0A39ca1b534e2Af850d898Fc9a3';
+        const contractABI = [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "player",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "score",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "position",
+          "type": "uint256"
+        }
+      ],
+      "name": "LeaderboardUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "player",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "score",
+          "type": "uint256"
+        }
+      ],
+      "name": "NewHighScore",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "highScores",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "leaderboard",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "highScore",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "wallet",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "score",
+          "type": "uint256"
+        }
+      ],
+      "name": "updateHighScore",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getLeaderboard",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "highScore",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "wallet",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct ClickGame.Player[3]",
+          "name": "",
+          "type": "tuple[3]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    }
+  ]
+
+        async function load() {
+            if (window.ethereum) {
+                window.web3 = new Web3(window.ethereum);
+                await window.ethereum.enable();
+            } else {
+                alert('Please install MetaMask to use this dApp!');
+            }
+
+            window.contract = new window.web3.eth.Contract(contractABI, contractAddress);
+            updateLeaderboard();
+        }
+
+        async function submitScore() {
+            const score = document.getElementById('scoreInput').value;
+            const accounts = await window.web3.eth.getAccounts();
+            const account = accounts[0];
+
+            await window.contract.methods.updateHighScore(score).send({ from: account });
+
+            updateLeaderboard();
+        }
+
+        async function updateLeaderboard() {
+            const leaderboard = await window.contract.methods.getLeaderboard().call();
+            const leaderboardElement = document.getElementById('leaderboard');
+            leaderboardElement.innerHTML = '';
+
+            for (let i = 0; i < leaderboard.length; i++) {
+                const player = leaderboard[i];
+                const listItem = document.createElement('li');
+                listItem.textContent = `#${i + 1}: ${player.wallet} - ${player.highScore}`;
+                leaderboardElement.appendChild(listItem);
+            }
+        }
+
+        window.addEventListener('load', load);
+    </script>
+</body>
+</html>
