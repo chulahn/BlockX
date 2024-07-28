@@ -7,9 +7,11 @@ contract OlympicClickathon {
     uint8 public decimals = 18;
     uint256 public totalSupply;
     address public owner;
+    uint256 public clickDuration = 30; // 30 seconds
 
     mapping(address => uint256) public balanceOf;
     mapping(address => uint256) public clicks;
+    mapping(address => uint256) public startTime;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Click(address indexed user, uint256 clicks);
@@ -25,6 +27,21 @@ contract OlympicClickathon {
         require(msg.sender == owner, "Only contract owner can call this function");
         _;
     }
+
+    function click() public {
+        if (startTime[msg.sender] == 0) {
+            startTime[msg.sender] = block.timestamp;
+        }
+
+        require(block.timestamp <= startTime[msg.sender] + clickDuration, "Clicking period has ended");
+
+        clicks[msg.sender] += 1;
+        balanceOf[msg.sender] += 1 * (10**uint256(decimals));
+        totalSupply += 1 * (10**uint256(decimals));
+        emit Click(msg.sender, clicks[msg.sender]);
+        emit Transfer(address(0), msg.sender, 1 * (10**uint256(decimals)));
+    }
+
     function transfer(address to, uint256 value) public returns (bool) {
         require(balanceOf[msg.sender] >= value, "Insufficient balance");
         balanceOf[msg.sender] -= value;
@@ -39,13 +56,4 @@ contract OlympicClickathon {
         emit GiftPurchase(msg.sender, gift, value);
         return true;
     }
-
-    function click() public {
-        clicks[msg.sender] += 1;
-        balanceOf[msg.sender] += 1 * (10**uint256(decimals));
-        totalSupply += 1 * (10**uint256(decimals));
-        emit Click(msg.sender, clicks[msg.sender]);
-        emit Transfer(address(0), msg.sender, 1 * (10**uint256(decimals)));
-    }
-
 }
