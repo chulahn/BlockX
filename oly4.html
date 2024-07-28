@@ -633,7 +633,7 @@
     }
   ]
  
-  let userAccount;
+        let userAccount;
         let contract;
         let timer;
         let timeLeft = 5;
@@ -757,15 +757,12 @@
                   console.log('Icon Element:', icon);
 
 
-                  // Create a text node for the player information
                   const textNode = document.createTextNode(`#${i + 1}: ${player.wallet} - ${player.score}`);
 
-                  // Append the text node and the icon to the list item
                   listItem.appendChild(textNode);
                   console.log(icon)
                   listItem.prepend(icon);
 
-                  // Append the list item to the leaderboard (assuming you have a UL element with id 'leaderboardList')
                   document.getElementById('leaderboard').appendChild(listItem);
                 }
             } catch (error) {
