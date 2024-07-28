@@ -1,4 +1,4 @@
-const MyToken = artifacts.require("MyToken2");
+const MyToken = artifacts.require("OlympicClickathon");
 
 module.exports = function(deployer) {
   deployer.deploy(MyToken);
