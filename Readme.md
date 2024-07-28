@@ -14,9 +14,11 @@
 ### We wanted to create a tokenomics experience, by giving those who validated authentic products tokens for them to be used.
 ### We were able to accomplish a landing page and a basic token smart contract deployed on Moonbeam.
 
-![alt text](./images/clickathon.png "Clickathon 1")
 
 ## July 2024
+
+![alt text](./images/clickathon.png "Clickathon 1")
+
 ### We pivoted just in time for EasyA Gaming Tracks and the Paris 2024 Olympics to bring you ClickLympics.
 ### An interactive 5 sec game, where the furious clickers are rewarded.
 ### Fully interactive front-end and smart contract.
