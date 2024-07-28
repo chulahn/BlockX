@@ -726,15 +726,55 @@
                 leaderboardElement.innerHTML = '';
 
                 for (let i = 0; i < leaderboard.length; i++) {
-                    const player = leaderboard[i];
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `#${i + 1}: ${player.wallet} - ${player.score}`;
-                    leaderboardElement.appendChild(listItem);
+                  const player = leaderboard[i];
+                  const listItem = document.createElement('li');
+
+                  // Create the icon image element
+                  const icon = document.createElement('img');
+
+                  switch (i) {
+                    case 0:
+                        icon.src="./images/gold2.png"
+                        break;
+
+                    case 1:
+                        icon.src="./images/silver2.png"
+                        break;
+
+                    case 2:
+                        icon.src="./images/bronze3.png"
+                        break;
+                  }
+                  icon.alt = 'Icon';
+
+                  // Add inline style for visibility debugging
+                  icon.style.display = 'inline-block';
+                  icon.style.width = '25px'; // Adjust size for visibility
+                  icon.style.height = '25px';
+
+
+                  // Log the icon element to debug
+                  console.log('Icon Element:', icon);
+
+
+                  // Create a text node for the player information
+                  const textNode = document.createTextNode(`#${i + 1}: ${player.wallet} - ${player.score}`);
+
+                  // Append the text node and the icon to the list item
+                  listItem.appendChild(textNode);
+                  console.log(icon)
+                  listItem.prepend(icon);
+
+                  // Append the list item to the leaderboard (assuming you have a UL element with id 'leaderboardList')
+                  document.getElementById('leaderboard').appendChild(listItem);
                 }
             } catch (error) {
                 console.error("Error updating leaderboard", error);
             }
         }
+
+
+       
 
 
         $(".window-border").draggable({
