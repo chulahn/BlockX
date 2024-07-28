@@ -7,15 +7,15 @@ contract OlympicClickathon {
     uint8 public decimals = 18;
     uint256 public totalSupply;
     address public owner;
-    uint256 public clickDuration = 30; // 30 seconds
 
     mapping(address => uint256) public balanceOf;
     mapping(address => uint256) public clicks;
-    mapping(address => uint256) public startTime;
+    mapping(address => uint256) public highScore;
 
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Click(address indexed user, uint256 clicks);
     event GiftPurchase(address indexed user, string gift, uint256 value);
+    event NewHighScore(address indexed user, uint256 highScore);
 
     constructor() {
         owner = msg.sender;
@@ -28,18 +28,21 @@ contract OlympicClickathon {
         _;
     }
 
-    function click() public {
-        if (startTime[msg.sender] == 0) {
-            startTime[msg.sender] = block.timestamp;
+    function startClicking() public {
+        clicks[msg.sender] = 0; // reset clicks for the new session
+    }
+
+    function endClicking(uint256 clickCount) public {
+        clicks[msg.sender] = clickCount;
+        balanceOf[msg.sender] += clickCount * (10**uint256(decimals));
+        totalSupply += clickCount * (10**uint256(decimals));
+        
+        if (clickCount > highScore[msg.sender]) {
+            highScore[msg.sender] = clickCount;
+            emit NewHighScore(msg.sender, clickCount);
         }
 
-        require(block.timestamp <= startTime[msg.sender] + clickDuration, "Clicking period has ended");
-
-        clicks[msg.sender] += 1;
-        balanceOf[msg.sender] += 1 * (10**uint256(decimals));
-        totalSupply += 1 * (10**uint256(decimals));
-        emit Click(msg.sender, clicks[msg.sender]);
-        emit Transfer(address(0), msg.sender, 1 * (10**uint256(decimals)));
+        emit Transfer(address(0), msg.sender, clickCount * (10**uint256(decimals)));
     }
 
     function transfer(address to, uint256 value) public returns (bool) {

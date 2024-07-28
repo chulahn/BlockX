@@ -10,6 +10,7 @@
     <button id="clickButton">Click Me!</button>
     <p id="clickCount">Clicks: 0</p>
     <p id="balance">Balance: 0 OCT</p>
+    <p id="highScore">High Score: 0</p>
     <p id="timer">Time Left: 5</p>
     <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
     <script>
@@ -28,8 +29,7 @@
                 console.log("Non-Ethereum browser detected. You should consider trying MetaMask!");
             }
         });
-
-        const contractAddress = '0x5919f66A660be9Fbd4a2f65d4E6eC37c39432f9b'; // Replace with your deployed contract address
+        const contractAddress = '0xbB59Eb03E402CE042E4e627284e2735b038B64e0'; // Replace with your deployed contract address
         const abi = [
     {
       "inputs": [],
@@ -78,6 +78,25 @@
         }
       ],
       "name": "GiftPurchase",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "highScore",
+          "type": "uint256"
+        }
+      ],
+      "name": "NewHighScore",
       "type": "event"
     },
     {
@@ -157,6 +176,25 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "highScore",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "name",
       "outputs": [
@@ -209,6 +247,26 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "startClicking",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "clickCount",
+          "type": "uint256"
+        }
+      ],
+      "name": "endClicking",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -255,13 +313,6 @@
       ],
       "stateMutability": "nonpayable",
       "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "click",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
     }
   ]
 
@@ -279,10 +330,13 @@
             document.getElementById('clickButton').addEventListener('click', clickButton);
             updateBalance();
             updateClicks();
+            updateHighScore();
         }
 
         async function clickButton() {
-            clickCount += 1;
+            if (timeLeft > 0) {
+                clickCount += 1;
+            }
             document.getElementById('clickCount').textContent = `Clicks: ${clickCount}`;
 
             if (!timer) {
@@ -312,6 +366,7 @@
                 document.getElementById('timer').textContent = `Time Left: ${timeLeft}`;
                 updateBalance();
                 updateClicks();
+                updateHighScore();
             } catch (error) {
                 console.error("Error ending clicking session", error);
             }
@@ -327,13 +382,21 @@
             }
         }
 
-
         async function updateClicks() {
             try {
                 const clicks = await contract.methods.clicks(userAccount).call();
                 document.getElementById('clickCount').textContent = `Clicks: ${clicks}`;
             } catch (error) {
                 console.error("Error updating clicks", error);
+            }
+        }
+
+        async function updateHighScore() {
+            try {
+                const highScore = await contract.methods.highScore(userAccount).call();
+                document.getElementById('highScore').textContent = `High Score: ${highScore}`;
+            } catch (error) {
+                console.error("Error updating high score", error);
             }
         }
     </script>
