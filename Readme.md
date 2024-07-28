@@ -3,7 +3,7 @@
 
 ![alt text](./images/block.png "Block 1")
 
-![alt text](./images/bloc2.png "Block 2")
+![alt text](./images/block2.png "Block 2")
 ##June 2023
 ###We had BlockX which was marketplace platform for connecting buyers with authentic products.
 ###We wanted to create a tokenomics experience, by giving those who validated authentic products tokens for them to be used.
